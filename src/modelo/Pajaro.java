@@ -1,33 +1,27 @@
 package modelo;
 
-import java.awt.*;
+import java.awt.Image;
+import java.awt.Graphics;
 
-public class Pajaro extends Dibujo{
+import interfaces.IDibujable;
+
+public class Pajaro extends Dibujo implements IDibujable{
 	
 	 private int anchuraPajaro = 34;
 	 private int alturaPajaro = 24;
 	 Image imagen;
 
-	public Pajaro(int posEjeX, int posEjeY, Imagen imagen) {
-		super(posEjeX, posEjeY);
-		this.alturaPajaro = alturaPajaro;
-		this.anchuraPajaro = anchuraPajaro;
-		this.imagen = imagen;
-		
-		// TODO Auto-generated constructor stub
-	}
-}
-/*
-    int birdX = boardWidth/8;
-    int birdY = boardHeight/2;
-   
+	 public Pajaro(int x, int y, int anchura, int altura, Image img) {
+	        super(x, y, anchura, altura, img);
+	    }
 
-    public Pajaro(anchuraPantalla, alturaPantalla) {
-        int  = birdX;
-        int y = birdY;
-        int width = birdWidth;
-        int height = birdHeight;
-        Image img;
-    }*/
+	@Override
+	public void dibujar(Graphics g) {
+		g.drawImage(imagen, posEjeX, posEjeY, anchura, altura, null);
+		
+	}
+
+}
+
 	
 

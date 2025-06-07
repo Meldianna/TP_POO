@@ -68,7 +68,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     int velocityY = 0; //move bird up/down speed.
     int gravity = 1; //fuerza con la que cae hacia abajo
 
-    ArrayList<Pipe> pipes; //GamePanel o Tuberia?
+    ArrayList<Pipe> pipes; //GamePanel o Tuberia? --> gamePanel, la tubería es una tubería independiente, no necesita tener un Array de otras tuberías
     Random random = new Random();
 
     Timer gameLoop;
@@ -172,7 +172,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
 	}
 
-    public void move() {
+    public void move() {//modificar para adecuarlo a las nuevas clases
         //bird
         velocityY += gravity;
         bird.y += velocityY;

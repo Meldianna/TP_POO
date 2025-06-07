@@ -1,28 +1,23 @@
 package modelo;
+import java.awt.Graphics;
+import java.awt.Image;
 
-public abstract class Dibujo {
+///Se hace esta clase Dibujo para quitarle la tarea al GamePanel de dibujar cada imagen y hacerlo más prolijo 
+///ahora no le importa cómo se dibuja cada elemento.
+public abstract class Dibujo{
 	protected int posEjeX;
 	protected int posEjeY;
-	
 	protected int anchura;
 	protected int altura;
-	
-	
-	public Dibujo(int posEjeX, int posEjeY, int anchura, int altura) {
+	protected Image imagen; //imagen a dibujar (usada en GamePanel)
+
+	public Dibujo(int posEjeX, int posEjeY, int anchura, int altura, Image imagen) {
 		this.posEjeX = posEjeX;
 		this.posEjeY = posEjeY;
 		this.anchura = anchura;
 		this.altura = altura;
+		this.imagen = imagen;
 	}
-
-	//mejor usar este, porque sabemos que la anchura y altura del dibujo es una sola
-	public Dibujo(int posEjeX, int posEjeY) {
-		this.posEjeX = posEjeX;
-		this.posEjeY = posEjeY;
-		this.anchura = anchura;
-		this.altura = altura;
-	}
-
 
 	public int getPosEjeX() {
 		return posEjeX;
