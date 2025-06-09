@@ -6,56 +6,7 @@ import java.util.Random;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
-  
-    
-  
-    //bird class
-    //mismos comentarios que con la clase tubería
-    /*
-     * CLASE BIRD 
-     * int birdX = boardWidth/8;
-    int birdY = boardHeight/2;
-    int birdWidth = 34;
-    int birdHeight = 24;
 
-    class Bird {
-        int x = birdX;
-        int y = birdY;
-        int width = birdWidth;
-        int height = birdHeight;
-        Image img;
-
-        Bird(Image img) {
-            this.img = img;
-        }
-    }*/
-    
-    
-    
-    
-      //scaled by 1/6
-    
-  // estos atributos pueden ir en la clase tubería
-
-    /*CLASE TUBERÍA
-     *  class Pipe {
-    	int pipeX = boardWidth;
-        int pipeY = 0;
-        int x = pipeX; //refactorizarse a tuberiaX = boardWidth
-        int y = pipeY; //refactorizarse a tuberiaY = 0 --> indica que la imagen comienza en el borde superior de la pantalla
-        int width = pipeWidth;  //refactorizarse a anchuraTuberia = numero
-        int height = pipeHeight; //refactorizarse a alturaTuberia = numero. 
-        //Hay que pensar que para asignar el alto de la tuberia, 
-        //tenemos que definir cuánto espacio hay para que pase el pájaro
-        Image img;
-        boolean passed = false;
-
-        Pipe(Image img) {
-            this.img = img;
-        }
-      }*/
-   
-    
 
     //atributos de GamePanel. Accedidos únicamente por esta clase
     public int boardWidth = 360; //pixeles de la pantalla donde se pondrán los elementos
@@ -64,7 +15,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Pajaro pajaro;
 
 <<<<<<< HEAD
-    ArrayList<Pipe> pipes; //GamePanel o Tuberia? --> gamePanel, la tubería es una tubería independiente, no necesita tener un Array de otras tuberías
+    ArrayList<Pipe> pipes; 
     Random random = new Random();
 =======
     private Puntaje puntaje;
@@ -75,7 +26,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int gravedadPajaro= 1; //fuerza con la que cae hacia abajo
 >>>>>>> dc424ba (juego refactorizado y funcional)
 
-    private ArrayList<Tuberia> tuberias; //GamePanel o Tuberia?
+    private ArrayList<Tuberia> tuberias;
     private Random random = new Random(); //usado para dibujar nuevas tuberías con alturas variables
 
     private Timer gameLoop; //
@@ -88,7 +39,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     Image birdImg = new ImageIcon(getClass().getResource("flappybird.png")).getImage();
     Image topPipeImg = new ImageIcon(getClass().getResource("toppipe.png")).getImage();
     Image bottomPipeImg = new ImageIcon(getClass().getResource("bottompipe.png")).getImage();
-    public GamePanel() { //constructor de la clase
+    
+	
+	public GamePanel() { //constructor de la clase
     	
     	//características del GamePanel
         setPreferredSize(new Dimension(boardWidth, boardHeight));
@@ -118,7 +71,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	}
     
     
-    void placePipes() {
+    public void placePipes() { 
         //(0-1) * pipeHeight/2. -> (numRandom * 512/2). Cada tubería tiene un alto de 256 px, multiplicado al número random
         
     	/*a pipeY se restan dos cosas: un valor fijo -> pipeHeight; y un numero random
@@ -223,7 +176,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }*/
     
     public void move() {
-        //bird
         velocidadPajaroY += gravedadPajaro;
         pajaro.setPosEjeY(pajaro.getPosEjeY() + velocidadPajaroY);
        
