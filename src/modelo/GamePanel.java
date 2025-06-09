@@ -6,21 +6,14 @@ import java.util.Random;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
-    int boardWidth = 360; //pixeles de la pantalla donde se pondrán los elementos
-    int boardHeight = 640;
-
-    //images
-    Image backgroundImg;
-    Image birdImg;
-    Image topPipeImg;
-    Image bottomPipeImg;
+  
     
+  
     //bird class
     //mismos comentarios que con la clase tubería
     /*
-     * CLASE BIRD */
-    
-    int birdX = boardWidth/8;
+     * CLASE BIRD 
+     * int birdX = boardWidth/8;
     int birdY = boardHeight/2;
     int birdWidth = 34;
     int birdHeight = 24;
@@ -35,17 +28,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Bird(Image img) {
             this.img = img;
         }
-    }
-
+    }*/
     
-    int pipeX = boardWidth;
-    int pipeY = 0;
-    int pipeWidth = 64;  //scaled by 1/6
-    int pipeHeight = 512;
+    
+    
+    
+      //scaled by 1/6
+    
   // estos atributos pueden ir en la clase tubería
 
-    /*CLASE TUBERÍA*/
-    class Pipe {
+    /*CLASE TUBERÍA
+     *  class Pipe {
+    	int pipeX = boardWidth;
+        int pipeY = 0;
         int x = pipeX; //refactorizarse a tuberiaX = boardWidth
         int y = pipeY; //refactorizarse a tuberiaY = 0 --> indica que la imagen comienza en el borde superior de la pantalla
         int width = pipeWidth;  //refactorizarse a anchuraTuberia = numero
@@ -58,58 +53,71 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Pipe(Image img) {
             this.img = img;
         }
-    }
+      }*/
+   
+    
 
-    //game logic
-    /*atributos de GamePanel
-     * */
-    Bird bird;
-    int velocityX = -2; //move pipes to the left speed (simulates bird moving right
-    int velocityY = 0; //move bird up/down speed.
-    int gravity = 1; //fuerza con la que cae hacia abajo
+    //atributos de GamePanel. Accedidos únicamente por esta clase
+    public int boardWidth = 360; //pixeles de la pantalla donde se pondrán los elementos
+    public int boardHeight = 640;
+   
+    private Pajaro pajaro;
 
+<<<<<<< HEAD
     ArrayList<Pipe> pipes; //GamePanel o Tuberia? --> gamePanel, la tubería es una tubería independiente, no necesita tener un Array de otras tuberías
     Random random = new Random();
+=======
+    private Puntaje puntaje;
+    private Background bkg;
+    
+    private int velocidadTuberiasX = -2; //velocidad que mueve las tuberías a la izquierda para simular avance del pájaro, sobre eje X
+    private int velocidadPajaroY = 0; //velocidad en la que sube o baja el pájaro sobre el eje Y
+    private int gravedadPajaro= 1; //fuerza con la que cae hacia abajo
+>>>>>>> dc424ba (juego refactorizado y funcional)
 
-    Timer gameLoop;
-    Timer placePipeTimer;
+    private ArrayList<Tuberia> tuberias; //GamePanel o Tuberia?
+    private Random random = new Random(); //usado para dibujar nuevas tuberías con alturas variables
+
+    private Timer gameLoop; //
+    private Timer posTuberiasTimer; //para actualizar la posición de las tuberías con cada "tick" del timer
     boolean gameOver = false;
     double score = 0;
-
-    GamePanel() {
+    
+    //cargando imágenes en atributos declarados en el constructor
+    Image backgroundImg = new ImageIcon(getClass().getResource("flappybirdbg.png")).getImage();
+    Image birdImg = new ImageIcon(getClass().getResource("flappybird.png")).getImage();
+    Image topPipeImg = new ImageIcon(getClass().getResource("toppipe.png")).getImage();
+    Image bottomPipeImg = new ImageIcon(getClass().getResource("bottompipe.png")).getImage();
+    public GamePanel() { //constructor de la clase
+    	
+    	//características del GamePanel
         setPreferredSize(new Dimension(boardWidth, boardHeight));
         // setBackground(Color.blue);
         setFocusable(true);
         addKeyListener(this);
 
-        //load images
-        backgroundImg = new ImageIcon(getClass().getResource("flappybirdbg.png")).getImage();
-        birdImg = new ImageIcon(getClass().getResource("flappybird.png")).getImage();
-        topPipeImg = new ImageIcon(getClass().getResource("toppipe.png")).getImage();
-        bottomPipeImg = new ImageIcon(getClass().getResource("bottompipe.png")).getImage();
-
-        
-        //puede ser simplemente 
-        //Bird bird = new Bird(birdImg) y ArrayList<Pipe> pipes = new ArrayList<Pipe>;
-        bird = new Bird(birdImg);
-        pipes = new ArrayList<Pipe>();
-
+       
+        this.pajaro = new Pajaro(boardWidth/8, boardHeight/2, birdImg);
+        this.tuberias = new ArrayList<>();
+        this.puntaje = new Puntaje(10,35);
+        this.bkg = new Background(backgroundImg);
         //place pipes timer
-        placePipeTimer = new Timer(1500, new ActionListener() {
+        posTuberiasTimer = new Timer(2000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
               // Code to be executed
               placePipes();
             }
         });
-        placePipeTimer.start();
+        posTuberiasTimer.start();
         
 		//game timer
 		gameLoop = new Timer(1000/60, this); //how long it takes to start timer, milliseconds gone between frames 
         gameLoop.start();
+
 	}
     
-    //método de clase Tuberia
+    
     void placePipes() {
         //(0-1) * pipeHeight/2. -> (numRandom * 512/2). Cada tubería tiene un alto de 256 px, multiplicado al número random
         
@@ -123,29 +131,39 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		Al ser negativa, el tubo comienza fuera del borde superior de la pantalla y baja 
 		hasta mostrarse parcialmente, generando un efecto de altura aleatoria.*/
     	
-    	int randomPipeY = (int) (pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2)); //random da un resultado tipo double
+    	int randomPipeY = (int) (0 - Tuberia.ALTURA_TUBERIA/4 - Math.random()*(Tuberia.ALTURA_TUBERIA/2)); //random da un resultado tipo double
     	//(int) es para truncar el resultado double a un entero
     	
         int openingSpace = boardHeight/4; //espacio entre tubos, constante
     
         
         
-        Pipe topPipe = new Pipe(topPipeImg);
-        topPipe.y = randomPipeY;
-        pipes.add(topPipe); 
+        Tuberia topPipe = new Tuberia(boardWidth, 0, topPipeImg);
+        topPipe.setPosEjeY(randomPipeY);//pipe.y = randomPipeY;
+        tuberias.add(topPipe); 
     
-        Pipe bottomPipe = new Pipe(bottomPipeImg);
-        bottomPipe.y = topPipe.y  + pipeHeight + openingSpace;
-        pipes.add(bottomPipe);
+        Tuberia bottomPipe = new Tuberia(boardWidth, 0, bottomPipeImg);
+        bottomPipe.setPosEjeY(topPipe.getPosEjeY() + topPipe.getAlturaTuberia() + openingSpace);
+        tuberias.add(bottomPipe);
+        
+        
+        System.out.println("Tuberías colocadas. Top Y: " + topPipe.getPosEjeY() + " Bottom Y: " + bottomPipe.getPosEjeY());
     }
+
     
 //interfaz drawable
     
     public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		draw(g);
+		bkg.dibujar(g);         // Primero el fondo
+	    for (Tuberia t : tuberias) {
+	        t.dibujar(g);       // Luego las tuberías (array)
+	    }
+	    pajaro.dibujar(g);      // Luego el pájaro
+	    puntaje.dibujar(g);  
+	
 	}
-
+/*
 	public void draw(Graphics g) {
         //background
         g.drawImage(backgroundImg, 0, 0, this.boardWidth, this.boardHeight, null);
@@ -170,11 +188,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawString(String.valueOf((int) score), 10, 35);
         }
         
+<<<<<<< HEAD
 	}
 
     public void move() {//modificar para adecuarlo a las nuevas clases
+=======
+	}*/
+/*
+    public void move() {
+>>>>>>> dc424ba (juego refactorizado y funcional)
         //bird
-        velocityY += gravity;
+        velocidadPajaroY += gravedadPajaro;
         bird.y += velocityY;
         bird.y = Math.max(bird.y, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
 
@@ -196,21 +220,50 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (bird.y > boardHeight) {
             gameOver = true;
         }
+    }*/
+    
+    public void move() {
+        //bird
+        velocidadPajaroY += gravedadPajaro;
+        pajaro.setPosEjeY(pajaro.getPosEjeY() + velocidadPajaroY);
+       
+        pajaro.setPosEjeY(Math.max(pajaro.getPosEjeY(), 0)); //apply gravity to current bird.y, limit the bird.y to top of the canvas
+
+        //pipes
+        for (int i = 0; i < tuberias.size(); i++) {
+            Tuberia pipe = tuberias.get(i);
+            pipe.setPosEjeX(pipe.getPosEjeX() + velocidadTuberiasX);
+;
+
+            if (!pipe.isPassed() && pajaro.getPosEjeX() > pipe.getPosEjeX() + pipe.anchura) {
+                score += 0.5; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
+                pipe.setPassed(true);
+            }
+
+            if (collision(pajaro, pipe)) {
+                gameOver = true;
+            }
+        }
+
+        if (pajaro.getPosEjeY() > boardHeight) {
+            gameOver = true;
+        }
     }
 
-    boolean collision(Bird a, Pipe b) {
-        return a.x < b.x + b.width &&   //a's top left corner doesn't reach b's top right corner
-               a.x + a.width > b.x &&   //a's top right corner passes b's top left corner
-               a.y < b.y + b.height &&  //a's top left corner doesn't reach b's bottom left corner
-               a.y + a.height > b.y;    //a's bottom left corner passes b's top left corner
+    boolean collision(Pajaro p, Tuberia t) {
+        return p.getPosEjeX() < t.getPosEjeX()+ t.anchura &&   //a's top left corner doesn't reach b's top right corner
+        		p.getPosEjeX() + p.getAnchura() > t.getPosEjeX() &&   //a's top right corner passes b's top left corner
+               p.getPosEjeY() < t.getPosEjeY() + t.getAltura() &&  //a's top left corner doesn't reach b's bottom left corner
+               p.getPosEjeY() + p.getAltura() > t.getPosEjeY();    //a's bottom left corner passes b's top left corner
     }
 
     @Override
     public void actionPerformed(ActionEvent e) { //called every x milliseconds by gameLoop timer
         move();
+        puntaje.actualizar((int) score, gameOver); // Update the score object
         repaint();
         if (gameOver) {
-            placePipeTimer.stop();
+            posTuberiasTimer.stop();
             gameLoop.stop();
         }
     }  
@@ -219,17 +272,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             // System.out.println("JUMP!");
-            velocityY = -9; //con cada tecla apretada, el pajaro sube 9 unidades
+            velocidadPajaroY = -9; //con cada tecla apretada, el pajaro sube 9 unidades
 
             if (gameOver) {
                 //restart game by resetting conditions
-                bird.y = birdY;
-                velocityY = 0;
-                pipes.clear();
+                pajaro.setPosEjeY(boardHeight/2);
+                velocidadPajaroY = 0;
+                tuberias.clear();
                 gameOver = false;
                 score = 0;
                 gameLoop.start();
-                placePipeTimer.start();
+                posTuberiasTimer.start();
             }
         }
     }
