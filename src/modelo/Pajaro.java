@@ -10,20 +10,11 @@ public class Pajaro extends Dibujo implements IDibujable{
 	 private int anchuraPajaro = 34;
 	 private int alturaPajaro = 24;
 
-<<<<<<< HEAD
+
 	 public Pajaro(int x, int y, int anchura, int altura, Image img) {
 	        super(x, y, anchura, altura, img);
 	    }
 
-	@Override
-	public void dibujar(Graphics g) {
-		g.drawImage(imagen, posEjeX, posEjeY, anchura, altura, null);
-		
-	}
-
-}
-
-=======
 
 	 
 	 public Pajaro(int x, int y, Image img) {
@@ -50,10 +41,6 @@ public class Pajaro extends Dibujo implements IDibujable{
 	public void setAlturaPajaro(int alturaPajaro) {
 		this.alturaPajaro = alturaPajaro;
 	}
-
-
->>>>>>> dc424ba (juego refactorizado y funcional)
-	
 
 
 	@Override
