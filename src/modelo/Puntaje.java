@@ -2,36 +2,32 @@ package modelo;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-<<<<<<< HEAD
-import java.awt.Image;
 
 import interfaces.IDibujable;
-public class Puntaje extends Dibujo implements IDibujable{
-=======
 
-import interfaces.IDibujable;
+
 public class Puntaje implements IDibujable{ //puntaje no hereda de Dibujo porque no comparte atributos. Sólo implementa el método de la interfaz
->>>>>>> dc424ba (juego refactorizado y funcional)
+
 	//No dibuja una imagen, sino texto. el método dibujar() cambia.
 	
 	//Puntaje necesita saber si el juego ha terminado para poder cambiar la forma en que se dibuja el texto (de "12" a "Game Over: 12").
 	private boolean gameOver = false;
 	private int puntajeActual = 0;
-<<<<<<< HEAD
-
-	
-	public Puntaje(int posEjeX, int posEjeY) {
-		super(posEjeX, posEjeY, 0, 0, null);//no necesita ancho ni alto (valores en 0) y tampoco una imagen(valor null)
-=======
 	private int posEjeX;
 	private int posEjeY;
-	
 
+	
+	/*public Puntaje(int posEjeX, int posEjeY) {
+		super(posEjeX, posEjeY, 0, 0, null);//no necesita ancho ni alto (valores en 0) y tampoco una imagen(valor null)
+
+	}
+	
+*/
 	
 	public Puntaje(int posEjeX, int posEjeY) {
 		this.posEjeX = posEjeX;
 		this.posEjeY = posEjeY;
->>>>>>> dc424ba (juego refactorizado y funcional)
+
 		//gameOver y puntaleActual ya se inicializan antes
 	}
 
@@ -63,11 +59,7 @@ public class Puntaje implements IDibujable{ //puntaje no hereda de Dibujo porque
         this.puntajeActual = puntaje;
         this.gameOver = gameOver;
     }
-
     
-	
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dc424ba (juego refactorizado y funcional)
+
+   
