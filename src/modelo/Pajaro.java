@@ -1,6 +1,7 @@
 package modelo;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Graphics;
 
 import interfaces.IDibujable;
@@ -47,6 +48,14 @@ public class Pajaro extends Dibujo implements IDibujable{
 	public void dibujar(Graphics g) {
 		g.drawImage(imagen, posEjeX, posEjeY, anchura, altura, null);
 		
+	}
+	public void Rectangle() {}
+
+
+
+	public Rectangle getBounds() {
+		return new Rectangle(posEjeX, posEjeY, anchura, altura);
+	
 	}
 
 }
