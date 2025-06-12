@@ -1,9 +1,11 @@
 package modelo;
 import java.awt.*;
+
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
+
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
   
@@ -11,22 +13,27 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     //atributos de GamePanel. Accedidos únicamente por esta clase
     public int boardWidth = 360; //pixeles de la pantalla donde se pondrán los elementos
     public int boardHeight = 640;
-    private int velocidadTuberiasX = -2; //velocidad que mueve las tuberías a la izquierda para simular avance del pájaro, sobre eje X
+    private int velocidadTuberiasX = -4; //velocidad que mueve las tuberías a la izquierda para simular avance del pájaro, sobre eje X
     private int velocidadPajaroY = 0; //velocidad en la que sube o baja el pájaro sobre el eje Y
     private int gravedadPajaro= 1; //fuerza con la que cae hacia abajo
     private int openingSpace = boardHeight / 4; //espacio constante entre tubos
-
+    //private boolean manzanaFueTocada = false;
+    //private final int VELOCIDAD_NORMAL = -2;
     
     private Pajaro pajaro;
     private Puntaje puntaje;
+   // private ManzanaVelocidad manzanaV;
+    private ManzanaPuntaje manzanaP;
+    ///si esto es muy IA, entonces podemos validar dentro de la colisión si la manzana es de un tipo u otra
+    ///y aplicar el efecto
+
     private Background bkg;
-    private Comida manzana;
     private ArrayList<Tuberia> tuberias; //GamePanel o Tuberia?
     private Random random = new Random(); //usado para dibujar nuevas tuberías con alturas variables
 
     private Timer gameLoop; //
     private Timer posTuberiasTimer; 
-    private Timer posManzanaTimer;//para actualizar la posición de las tuberías con cada "tick" del timer
+    //private Timer slowMotionTimer;//por cuánto tiempo se aplica el efecto slowMotion de las tuberías
     boolean gameOver = false;
     double score = 0;
     
@@ -35,8 +42,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     Image birdImg = new ImageIcon(getClass().getResource("flappybird.png")).getImage();
     Image topPipeImg = new ImageIcon(getClass().getResource("toppipe.png")).getImage();
     Image bottomPipeImg = new ImageIcon(getClass().getResource("bottompipe.png")).getImage();
-    Image manzanaImg = new ImageIcon(getClass().getResource("manzana.png")).getImage();
-    
+   // Image manzanaVImg = new ImageIcon(getClass().getResource("manzana.png")).getImage();
+    Image manzanaPImg = new ImageIcon(getClass().getResource("manzanaVerde.webp")).getImage(); //cambiar imagen
     
     public GamePanel() { //constructor de la clase
     	
@@ -51,10 +58,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         this.tuberias = new ArrayList<>();
         this.puntaje = new Puntaje(10,35);
         this.bkg = new Background(backgroundImg);
-       
-    
+        
+        //inicializadas fuera de la pantalla para evitar "nullPointerException" en paintComponent()
+        this.manzanaP = new ManzanaPuntaje(-100, -100, 30, 30, manzanaPImg);
+       // this.manzanaV = new ManzanaVelocidad(-100, -100, 30, 30, manzanaVImg);
         //place pipes timer
-        posTuberiasTimer = new Timer(2000, new ActionListener() {
+        posTuberiasTimer = new Timer(1500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
               placePipes();
@@ -62,19 +71,25 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         });
         posTuberiasTimer.start();
         
-        posManzanaTimer = new Timer(3000, new ActionListener() {
-        	@Override
-            public void actionPerformed(ActionEvent e) {
-              placeApple();
-            }
-        });
-        
-        posManzanaTimer.start();
+       
+       
 		//game timer
 		gameLoop = new Timer(1000/60, this); //how long it takes to start timer, milliseconds gone between frames 
         gameLoop.start();
+        
+        
+        /*timer
+        slowMotionTimer = new Timer(5000, new ActionListener() { // 5000 ms = 5 segundos
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Cuando el tiempo acaba, volvemos a la velocidad normal.
+                velocidadTuberiasX = VELOCIDAD_NORMAL; 
+            }
+        });
+        slowMotionTimer.setRepeats(false); // Muy importante: para que no se repita cada 5 seg.
+    }*/
+    }
 
-	}
     
     
    public void placePipes() {
@@ -92,8 +107,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     	
     	int randomPipeY = (int) (0 - Tuberia.ALTURA_TUBERIA/4 - Math.random()*(Tuberia.ALTURA_TUBERIA/2)); //random da un resultado tipo double
     	//(int) es para truncar el resultado double a un entero
-        
-        
+    	
         Tuberia topPipe = new Tuberia(boardWidth, 0, topPipeImg);
         topPipe.setPosEjeY(randomPipeY);//pipe.y = randomPipeY;
         tuberias.add(topPipe); 
@@ -102,33 +116,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         bottomPipe.setPosEjeY(topPipe.getPosEjeY() + topPipe.getAlturaTuberia() + openingSpace);
         tuberias.add(bottomPipe);
         
+
+     
+        if (!manzanaP.isVisible()) {
+            
+        	 // Calculamos la posición una sola vez
+            int manzanaX = topPipe.getPosEjeX() + (topPipe.getAnchura() / 2) - (30 / 2); // Usamos 30 como ancho
+            int centroHuecoY = topPipe.getPosEjeY() + topPipe.getAlturaTuberia() + (openingSpace / 2);
+            int manzanaY = centroHuecoY - (30 / 2); // Usamos 30 como alto
+
+                manzanaP.setPosicion(manzanaX, manzanaY);
+                manzanaP.setVisible(true);
+        }
         
-        System.out.println("Tuberías colocadas. Top Y: " + topPipe.getPosEjeY() + " Bottom Y: " + bottomPipe.getPosEjeY());
         
-        this.manzana = new Comida(0, 0, 30, 30, manzanaImg);
+       
     }
 
-   public void placeApple() {
-	   
-	    // Tomar las dos últimas tuberías colocadas
-	    Tuberia topPipe = tuberias.get(tuberias.size() - 2);
-	    Tuberia bottomPipe = tuberias.get(tuberias.size() - 1);
-
-	    // Calcular centro del espacio entre tuberías
-	    /*
-	     * topPipe.getPosEjeX() → te da la coordenada X inicial de la tubería superior.
-
-			topPipe.anchura / 2 → suma la mitad del ancho de la tubería, lo que te ubica en el centro horizontal de la tubería.
-
-			- manzana.getAnchura() / 2 → resta la mitad del ancho de la manzana, 
-			para que su centro quede alineado con el centro de la tubería 
-			(y no su esquina superior izquierda).*/
-	    
-	    int appleX = topPipe.getPosEjeX() + topPipe.anchura / 2 - manzana.getAnchura() / 2;
-	    int appleY = topPipe.getPosEjeY() + topPipe.getAltura() + (bottomPipe.getPosEjeY() - (topPipe.getPosEjeY() + topPipe.getAltura())) / 2 - manzana.getAltura() / 2;
-
-	    manzana.setPosicion(appleX, appleY); // Asume que tenés este método en la clase Comida
-	}
 
 //interfaz drawable
     
@@ -140,11 +144,55 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	    }
 	    pajaro.dibujar(g);      // Luego el pájaro
 	    puntaje.dibujar(g);
-	    manzana.dibujar(g);
-	
-	}
+	    
+	    //para evitar conflictos o "nullPointerExceptions"
+	    
+         //manzanaV.dibujar(g);
+         manzanaP.dibujar(g);
+            
+        }
+
     
     public void move() {
+        // --- Movimiento del Pájaro y las Tuberías (sin cambios) ---
+        velocidadPajaroY += gravedadPajaro;
+        pajaro.setPosEjeY(pajaro.getPosEjeY() + velocidadPajaroY);
+        pajaro.setPosEjeY(Math.max(pajaro.getPosEjeY(), 0));
+
+        for (Tuberia pipe : tuberias) {
+            pipe.setPosEjeX(pipe.getPosEjeX() + velocidadTuberiasX);
+
+            if (!pipe.isPassed() && pajaro.getPosEjeX() > pipe.getPosEjeX() + pipe.getAnchura()) {
+                score += 0.5;
+                pipe.setPassed(true);
+            }
+
+            if (collision(pajaro, pipe)) {
+                gameOver = true;
+            }
+        }
+
+        // --- LÓGICA DE MOVIMIENTO Y COLISIÓN PARA CADA MANZANA POR SEPARADO ---
+
+        // 1. Lógica para la Manzana de Puntos (manzanaP)
+        if (manzanaP.isVisible()) {
+            // Mover la manzana
+            manzanaP.setPosEjeX(manzanaP.getPosEjeX() + velocidadTuberiasX);
+
+            // Comprobar colisión con el pájaro
+            if (pajaro.getBounds().intersects(manzanaP.getBounds())) {
+                // Aplicar el efecto específico de la manzana de puntos
+                manzanaP.aplicarEfecto(this); 
+            }
+            
+            // Comprobar si salió de la pantalla
+            if (manzanaP.getPosEjeX() < -manzanaP.getAnchura()) {
+                manzanaP.setVisible(false);
+            }
+        }
+
+    }
+   /* public void move() {
         //bird
         velocidadPajaroY += gravedadPajaro;
         pajaro.setPosEjeY(pajaro.getPosEjeY() + velocidadPajaroY);
@@ -170,7 +218,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (pajaro.getPosEjeY() > boardHeight) {
             gameOver = true;
         }
-    }
+        
+        
+        
+    }*/
+    
+
 
     boolean collision(Pajaro p, Tuberia t) {
         return p.getPosEjeX() < t.getPosEjeX()+ t.anchura &&   //a's top left corner doesn't reach b's top right corner
@@ -187,10 +240,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (gameOver) {
             posTuberiasTimer.stop();
             gameLoop.stop();
-            posManzanaTimer.stop();
+           
+           
 
         }
-    }  
+    } 
+    
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -206,6 +261,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 score = 0;
                 gameLoop.start();
                 posTuberiasTimer.start();
+               
+                manzanaP.setVisible(false);
+              
             }
         }
     }
